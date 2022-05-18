@@ -1,0 +1,76 @@
+package main
+
+import (
+	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"time"
+
+	"github.com/sirupsen/logrus"
+)
+
+type NetUtility struct {
+	url, login, pass string
+	Header           map[string]string
+	Body             io.Reader
+	// Conf             *CommonConf
+}
+
+func (net *NetUtility) Construct(url, login, pass string) *NetUtility {
+	net.Header = make(map[string]string)
+
+	net.url = url
+	net.login = login
+	net.pass = pass
+
+	return net
+}
+
+func (net *NetUtility) CallHTTP(method string, Timeout time.Duration, beforeSend func(*http.Response)) (result string, err error) {
+	req, err := http.NewRequest(method, net.url, net.Body)
+	if err != nil {
+		// logrus.WithField("Сервис", net.url).Errorf("Произошла ошибка при регистрации запроса: %v", err)
+		panic(fmt.Errorf("Произошла ошибка при загрузки файла: %v", err))
+	}
+	if net.login != "" {
+		fmt.Println(net.login, net.pass)
+		req.SetBasicAuth(net.login, net.pass)
+	}
+
+	for k, v := range net.Header {
+		req.Header.Add(k, v)
+	}
+
+	client := &http.Client{Timeout: Timeout}
+	resp, err := client.Do(req)
+	if err != nil {
+		logrus.WithField("URL", net.url).Errorf("Произошла ошибка при выполнении запроса: %v", err)
+		return "", err
+	}
+	if resp != nil {
+		if err, result = net.readResp(resp); err != nil {
+			return "", err
+		}
+
+		if beforeSend != nil {
+			beforeSend(resp)
+		}
+	}
+	return result, nil
+}
+
+func (net *NetUtility) readResp(resp *http.Response) (error, string) {
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		logrus.WithField("URL", resp.Request.URL).Errorf("Произошла ошибка при чтении Body: %v", err)
+		return err, ""
+	}
+	if !(resp.StatusCode >= http.StatusOK && resp.StatusCode <= http.StatusIMUsed) {
+		logrus.WithField("body", string(body)).WithField("URL", resp.Request.URL).Errorf("Код ответа %v", resp.StatusCode)
+		return fmt.Errorf("Код возврата %v", resp.StatusCode), ""
+	}
+	return nil, string(body)
+}
