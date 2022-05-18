@@ -8,10 +8,10 @@ import (
 
 func main() {
 	odooClientPM, err := go_odoo.NewClient(&go_odoo.ClientConfig{
-		Admin:    odooLoginMro,
-		Password: odooPasswordMro,
-		Database: odooDatabaseMro,
-		URL:      odooUrlMro,
+		Admin:    odooLoginPM,
+		Password: odooPasswordPM,
+		Database: odooDatabasePM,
+		URL:      odooUrlPM,
 	})
 
 	if err != nil {

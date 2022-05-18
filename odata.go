@@ -37,10 +37,13 @@ func Clietn1cConnect() {
 		fmt.Println(err)
 		return
 	}
-	metadata1c := Metadata{}
+	metadata1c := &Metadata{}
 	err = json.Unmarshal(body, &metadata1c)
 	if err != nil {
 		fmt.Println(err)
+	}
+	for _, v := range metadata1c.Values {
+		fmt.Println(v)
 	}
 }
 

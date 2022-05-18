@@ -7,10 +7,10 @@ var (
 )
 
 var (
-	odooLoginMro    = "LOGIN"
-	odooPasswordMro = "PASS"
-	odooDatabaseMro = "DATABASE"
-	odooUrlMro      = "URL"
+	odooLoginPM    = "LOGIN"
+	odooPasswordPM = "PASS"
+	odooDatabasePM = "DATABASE"
+	odooUrlPM      = "URL"
 )
 
 var (
