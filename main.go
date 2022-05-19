@@ -20,18 +20,18 @@ func main() {
 	}
 	ClientPM = *odooClientPM
 
-	acc, err := ClientPM.FindAccountAccounts(nil, nil)
+	accounts, err := ClientPM.FindAccountAccounts(nil, nil)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	for _, v := range *acc {
-		if v.Name.Get() == "Нематериальные активы" {
-			c, err := ClientPM.GetAccountAccount(v.Id.Get())
+	for _, account := range *accounts {
+		if account.Name.Get() == "Нематериальные активы" {
+			acc, err := ClientPM.GetAccountAccount(account.Id.Get())
 			if err != nil {
 				fmt.Println(err)
 			}
-			fmt.Println(c.DisplayName, c.UserTypeId, v.Parent)
+			fmt.Println(acc.DisplayName, acc.UserTypeId, account.Parent)
 		}
 	}
 	// Clietn1cConnect()
